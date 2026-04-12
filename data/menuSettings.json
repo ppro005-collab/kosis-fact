@@ -1,0 +1,27 @@
+{
+  "super_admin": [
+    "analyze",
+    "factcheck",
+    "data_mgmt",
+    "dictionary",
+    "users",
+    "menu_settings",
+    "board",
+    "education",
+    "kosis_kb"
+  ],
+  "admin": [
+    "analyze",
+    "data_mgmt",
+    "dictionary",
+    "users",
+    "board",
+    "education"
+  ],
+  "user": [
+    "analyze",
+    "dictionary",
+    "board",
+    "education"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "KOSIS Fact Analytics",
+  "short_name": "KOSIS Fact",
+  "description": "청년층 부가조사 마이크로데이터 분석 및 팩트체크 플랫폼",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3182f6",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

@@ -1,0 +1,248 @@
+@import "tailwindcss";
+
+/* ──────────────────────────────────────────────────
+   Design Tokens
+────────────────────────────────────────────────── */
+:root {
+  --bg: #f5f6f8;
+  --white: #ffffff;
+  --toss-blue: #3182f6;
+  --toss-blue-hover: #1b6ef3;
+  --toss-gray-100: #f9fafb;
+  --toss-gray-400: #9ca3af;
+  --toss-shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+  --toss-shadow-md: 0 8px 32px rgba(0,0,0,0.06);
+  --toss-shadow-lg: 0 20px 60px rgba(0,0,0,0.10);
+  --radius-card: 28px;
+  --radius-button: 16px;
+  --radius-input: 16px;
+}
+
+/* ──────────────────────────────────────────────────
+   Base
+────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: #191f28;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Apple SD Gothic Neo', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.025em;
+}
+
+/* ──────────────────────────────────────────────────
+   Toss-style Component Library
+────────────────────────────────────────────────── */
+
+/* Card */
+.toss-card {
+  background: var(--white);
+  border-radius: var(--radius-card);
+  padding: 28px;
+  box-shadow: var(--toss-shadow-md);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.25s ease;
+}
+.toss-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--toss-shadow-lg);
+}
+
+/* Primary Button */
+.toss-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--toss-blue);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 15px;
+  padding: 14px 24px;
+  border-radius: var(--radius-button);
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 14px rgba(49, 130, 246, 0.25);
+  letter-spacing: -0.01em;
+}
+.toss-button:hover:not(:disabled) {
+  background: var(--toss-blue-hover);
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 6px 20px rgba(49, 130, 246, 0.35);
+}
+.toss-button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.toss-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Input */
+.toss-input {
+  display: block;
+  width: 100%;
+  background: var(--toss-gray-100);
+  border: 2px solid transparent;
+  border-radius: var(--radius-input);
+  padding: 15px 18px;
+  font-size: 15px;
+  font-family: inherit;
+  font-weight: 500;
+  color: #191f28;
+  outline: none;
+  transition: all 0.2s ease;
+  letter-spacing: -0.02em;
+}
+.toss-input:focus {
+  background: var(--white);
+  border-color: var(--toss-blue);
+  box-shadow: 0 0 0 4px rgba(49, 130, 246, 0.12);
+}
+.toss-input::placeholder { color: #b0b8c1; }
+
+/* ──────────────────────────────────────────────────
+   Typography Scale
+────────────────────────────────────────────────── */
+h1, h2, h3, h4 {
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+}
+
+.text-display {
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+}
+
+/* ──────────────────────────────────────────────────
+   Table Styles
+────────────────────────────────────────────────── */
+#result-table {
+  border-collapse: collapse;
+}
+#result-table thead th {
+  background: #f9fafb;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+  padding: 12px 16px;
+  position: sticky;
+  top: 0;
+}
+#result-table tbody td {
+  padding: 14px 16px;
+  vertical-align: middle;
+  border-top: 1px solid #f3f4f6;
+}
+#result-table tbody tr:hover td {
+  background: rgba(49, 130, 246, 0.03);
+}
+
+/* ──────────────────────────────────────────────────
+   Sidebar
+────────────────────────────────────────────────── */
+aside {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* ──────────────────────────────────────────────────
+   Fact-Check Status Cards
+────────────────────────────────────────────────── */
+.fact-green { border-left-color: #22c55e !important; }
+.fact-yellow { border-left-color: #f59e0b !important; }
+.fact-red { border-left-color: #ef4444 !important; }
+
+/* ──────────────────────────────────────────────────
+   Animations
+────────────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-in { animation: fadeInUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.animate-spin { animation: spin 0.7s linear infinite; }
+
+/* ──────────────────────────────────────────────────
+   Scrollbar
+────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 100px; }
+::-webkit-scrollbar-thumb:hover { background: #d1d5db; }
+
+/* ──────────────────────────────────────────────────
+   Mobile bottom-bar safe area & Responsive Table
+────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  main { padding-bottom: 80px; }
+  
+  /* Mobile Table Scroll Optimization -> Card-based UI (grid-cols-1) */
+  #result-table {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    background: transparent;
+    border: none;
+  }
+  
+  #result-table thead {
+    display: none; /* 헤더 감춤 */
+  }
+  
+  #result-table tbody {
+    display: contents; /* grid layout pass-through */
+  }
+  
+  #result-table tr {
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 4px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  }
+  
+  #result-table td, #result-table th {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: none !important;
+    padding: 10px 14px !important;
+    border-bottom: 1px dashed #f3f4f6 !important;
+    text-align: right;
+    font-size: 13px !important;
+  }
+  
+  #result-table td:last-child, #result-table th:last-child {
+    border-bottom: none !important;
+  }
+  
+  /* 첫 번째 셀(보통 행 제목)은 강조 */
+  #result-table tr td:first-child, #result-table tr th:first-child {
+    font-weight: 900;
+    font-size: 14px !important;
+    background: #f9fafb;
+    border-radius: 12px;
+    margin-bottom: 4px;
+    justify-content: flex-start;
+    color: var(--toss-blue);
+  }
+}
