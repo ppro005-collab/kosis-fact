@@ -1,13 +1,16 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { getKbChunks } from '@/lib/kbIndexer.js';
 
 /**
- * 10번(SAS 코드)과 11번(매뉴얼) 폴더를 통합하여 
+ * 10번(SAS 코드)과 11번(매뉴얼) 폴더를 통합하여
  * 카드형 명세서 구성을 위한 하이브리드 지식 베이스를 생성합니다.
+ * 상위 1~12번 폴더 텍스트는 kbIndexer로 색인(kb_index.json)됩니다.
  */
 export async function GET() {
   try {
+    const kbChunks = getKbChunks();
     const root = path.join(process.cwd(), '..');
     const sasRoot = path.join(root, '10. KOSIS 표 검증에 사용된 SAS 코드(클로드 활용)');
     const manualRoot = path.join(root, '11. KOSIS 표 SAS 코드 설명매뉴얼(클로드 활용)');
@@ -38,7 +41,17 @@ export async function GET() {
       return { type: config.type, label: config.label, tables };
     });
 
-    return NextResponse.json({ success: true, surveys: results });
+    return NextResponse.json({
+      success: true,
+      surveys: results,
+      kbIndex: {
+        chunkCount: kbChunks.length,
+        buckets: kbChunks.reduce((acc, c) => {
+          acc[c.bucket] = (acc[c.bucket] || 0) + 1;
+          return acc;
+        }, {})
+      }
+    });
 
   } catch (error) {
     console.error('Unified KB API Error:', error);

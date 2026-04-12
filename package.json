@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "share": "npx localtunnel --port 3000 --subdomain kosis-fact"
+    "share": "npx localtunnel --port 3000 --subdomain kosis-fact",
+    "build-kb": "node scripts/build-kb-index.mjs"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",

@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# KB 색인(용량 큼 — 서버 첫 요청 시 자동 생성)
+/data/kb_index.json
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

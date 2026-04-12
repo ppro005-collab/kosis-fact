@@ -183,6 +183,9 @@ export default function Home() {
   const [isTransposed, setIsTransposed] = useState(false);
   const [isLoading, setIsLoading]       = useState(false);
   const [showCode, setShowCode]         = useState(false);
+  const [showAnalysisSas, setShowAnalysisSas] = useState(false);
+  const [users, setUsers]               = useState(INITIAL_USERS);
+  const [isUploading, setIsUploading]   = useState(false);
   const [pivotConfig, setPivotConfig]   = useState({ rows: [], cols: [] });
   const [datasetMeta, setDatasetMeta]   = useState([]);  // [{key, label, recordCount}]
   const [intentClarification, setIntentClarification] = useState(null); // { message, options }
@@ -299,6 +302,7 @@ export default function Home() {
       }
 
       setAnalysisResult(data);
+      setShowAnalysisSas(false);
       
       // ─── 지능형 기본 축 설정 (1D vs 2D vs 시계열 최적화) ───────────
       const gbs = data.plan.groupBys || [];
@@ -680,7 +684,7 @@ export default function Home() {
               <div className="flex gap-1 border-l border-gray-200 pl-2">
                 <button onClick={handleDownloadExcel} className="p-2.5 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 shadow-sm transition-all"><Download size={16} /></button>
                 <button onClick={swapAxes} title="행/열 전환" className="p-2.5 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 shadow-sm transition-all"><RefreshCw size={16} /></button>
-                {userRole === 'super_admin' && <button onClick={()=>setShowCode(true)} className="p-2.5 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 shadow-sm transition-all"><Code2 size={16} /></button>}
+                <button type="button" onClick={()=>setShowCode(true)} title="피벗 기준 SAS 개요" className="p-2.5 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 shadow-sm transition-all"><Code2 size={16} /></button>
               </div>
             </div>
           </div>
@@ -894,6 +898,42 @@ export default function Home() {
             {datasetMeta.length > 0 ? ` · 수록 연도: ${datasetMeta.map(m=>m.label).join(' · ')}` : ''}
           </span>
         </div>
+
+        {analysisResult?.sasCode && (
+          <div className="border-t border-gray-100 pt-4 mt-4 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center gap-2 text-emerald-800">
+                <Code2 size={18} className="shrink-0" />
+                <span className="text-sm font-black">검증용 SAS 코드</span>
+                <span className="text-[10px] font-bold text-gray-400">(KOSIS·MDIS 대조용)</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAnalysisSas(v => !v)}
+                className="w-full sm:w-auto px-5 py-3 rounded-2xl text-sm font-black bg-emerald-600 text-white hover:bg-emerald-700 shadow-md transition-all"
+              >
+                {showAnalysisSas ? '코드 접기' : '코드 보기'}
+              </button>
+            </div>
+            {showAnalysisSas && (
+              <div className="bg-[#1a1b26] rounded-2xl p-5 overflow-x-auto border border-gray-800 relative group">
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(analysisResult.sasCode);
+                    alert('SAS 코드가 클립보드에 복사되었습니다.');
+                  }}
+                  className="absolute top-3 right-3 text-[11px] font-bold text-gray-200 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-xl"
+                >
+                  복사
+                </button>
+                <pre className="text-xs text-emerald-100/95 leading-relaxed font-mono pr-16 whitespace-pre-wrap">
+                  {analysisResult.sasCode}
+                </pre>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     );
   };
@@ -994,7 +1034,11 @@ export default function Home() {
                   <p className="text-sm font-black text-gray-400">마이크로데이터를 정밀 분석 중입니다...</p>
                 </div>
               )}
-              {!isLoading && analysisResult && renderResultTable()}
+              {!isLoading && analysisResult && (
+                <div className="space-y-6">
+                  {renderResultTable()}
+                </div>
+              )}
               {!isLoading && !analysisResult && (
                 <div className="toss-card p-20 flex flex-col items-center justify-center text-center space-y-6 border-2 border-dashed border-gray-100 bg-transparent">
                   <div className="w-20 h-20 bg-gray-50 rounded-[40px] flex items-center justify-center text-gray-200">
@@ -1406,7 +1450,7 @@ export default function Home() {
       case 'kosis_kb': {
         const currentSurvey = kbData?.find(s => s.type === selectedKbSurvey);
         const filteredTables = currentSurvey?.tables?.filter(t => 
-          t.id?.includes(kbSearch) || t.name?.includes(kbSearch) || t.keywords?. some(k => k.includes(kbSearch))
+          t.id?.includes(kbSearch) || t.name?.includes(kbSearch) || t.keywords?.some(k => k.includes(kbSearch))
         ) || [];
 
         return (
