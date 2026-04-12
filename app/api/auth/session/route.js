@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * api/auth/session/route.js
  * ─────────────
