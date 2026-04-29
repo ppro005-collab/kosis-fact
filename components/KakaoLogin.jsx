@@ -7,7 +7,7 @@ import React from 'react';
  */
 export const KakaoLoginButton = ({ onLoading }) => {
   const KAKAO_CLIENT_ID = "a6cc7aa688eb60b7a2c507a54bffbaaf"; 
-  const REDIRECT_URI = typeof window !== 'undefined' ? `${window.location.origin}/api/auth/kakao` : '';
+  const REDIRECT_URI = "https://kosis-fact.vercel.app/api/auth/kakao";
   
   const handleLogin = () => {
     const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;

@@ -27,7 +27,7 @@ export async function GET(request) {
         grant_type: 'authorization_code',
         client_id: process.env.KAKAO_CLIENT_ID || 'a6cc7aa688eb60b7a2c507a54bffbaaf', 
         client_secret: process.env.KAKAO_CLIENT_SECRET || '', 
-        redirect_uri: `${origin}/api/auth/kakao`,
+        redirect_uri: `https://kosis-fact.vercel.app/api/auth/kakao`,
         code,
       }),
     });
