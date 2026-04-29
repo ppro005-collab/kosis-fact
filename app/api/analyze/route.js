@@ -49,7 +49,7 @@ export async function POST(request) {
       });
     }
 
-    const planCacheKey = `v8:${query}`;
+    const planCacheKey = `v10:${query}`;
 
     let queryPlan = null;
     try {
