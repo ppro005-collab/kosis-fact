@@ -600,13 +600,23 @@ export default function Home() {
     // 학력, 성별 등 의미론적 순서가 있는 차원은 가나다 정렬 대신 표준 순서 사용
     const CATEGORY_ORDER = {
       '계': -1, '전체': -1,
+      // 학력
       '고졸 이하': 1,
       '전문대졸 (3년제 포함)': 2,
       '대학교졸 (4년제)': 3,
       '대학원졸 이상': 4,
-      '분류 불가': 5,
+      '분류 불가': 99,
+      // 성별
       '남자': 1, '여자': 2,
+      // 경제활동상태
       '취업자': 1, '실업자': 2, '비경제활동인구': 3,
+      // 연령대 (KOSIS 5세 구간 기준)
+      '15~19세': 1,
+      '20~24세': 2,
+      '25~29세': 3,
+      '30~34세': 4,
+      '35세 이상': 5,
+      // 구(舊) 라벨 호환
       '10대': 1, '20대': 2, '30대': 3, '40대 이상': 4,
     };
     const semanticSort = (a, b) => {
@@ -811,19 +821,30 @@ export default function Home() {
             <thead className="bg-gray-50 border-b-2 border-gray-200">
               {colDims.length === 0 ? (
                 <tr>
-                  <th className="px-5 py-3 text-left font-black text-gray-500 text-[11px] bg-gray-50 sticky left-0 border-r-2 border-gray-200 min-w-[120px]">
-                    {rowDims.length > 0 ? rowDims.join(' / ') : '기준'}
-                  </th>
+                  {(rowDims.length > 0 ? rowDims : ['기준']).map((dim, hIdx) => (
+                    <th
+                      key={`h-${dim}-${hIdx}`}
+                      className="px-4 py-3 text-left font-black text-gray-500 text-[11px] bg-gray-50 min-w-[104px] whitespace-nowrap sticky border-r-2 border-gray-200"
+                      style={{ left: `${hIdx * 104}px`, zIndex: 20 + hIdx }}
+                    >
+                      {dim}
+                    </th>
+                  ))}
                   <th className="px-4 py-3 text-center font-bold text-blue-700 bg-blue-50 text-[12px]">전체 합계</th>
                 </tr>
               ) : colDims.map((dim, dIdx) => (
                 <tr key={dim}>
-                  {dIdx === 0 && (
-                    <th rowSpan={colDims.length}
-                      className="px-5 py-3 text-left font-black text-gray-500 text-[11px] bg-gray-50 sticky left-0 border-r-2 border-gray-200 min-w-[120px]">
-                      {rowDims.length > 0 ? rowDims.join(' / ') : '기준'}
-                    </th>
-                  )}
+                  {dIdx === 0 &&
+                    (rowDims.length > 0 ? rowDims : ['기준']).map((rd, hIdx) => (
+                      <th
+                        key={`corner-${rd}-${hIdx}`}
+                        rowSpan={colDims.length}
+                        className="px-4 py-3 text-left font-black text-gray-500 text-[11px] bg-gray-50 align-bottom min-w-[104px] whitespace-nowrap sticky border-r-2 border-gray-200"
+                        style={{ left: `${hIdx * 104}px`, zIndex: 20 + hIdx }}
+                      >
+                        {rd}
+                      </th>
+                    ))}
                   {colCombinations.map((combo, cIdx) => {
                     const isShowing = cIdx === 0
                       || combo.slice(0, dIdx).join('|') !== colCombinations[cIdx-1].slice(0, dIdx).join('|')
@@ -863,7 +884,8 @@ export default function Home() {
                       const isTotalCell = val === '계' || val === '전체';
                       return (
                         <td key={vIdx} rowSpan={rowSpan}
-                          className={`px-5 py-3.5 font-bold border-r-2 border-gray-100 sticky left-0 z-10 text-[13px] ${isTotalCell ? 'text-blue-700 bg-blue-50' : 'text-gray-800 bg-white'}`}>
+                          className={`px-4 py-3.5 font-bold border-r-2 border-gray-100 sticky text-[13px] min-w-[104px] ${isTotalCell ? 'text-blue-700 bg-blue-50' : 'text-gray-800 bg-white'}`}
+                          style={{ left: `${vIdx * 104}px`, zIndex: 10 + vIdx }}>
                           {val}
                         </td>
                       );

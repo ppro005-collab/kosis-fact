@@ -49,11 +49,13 @@ export async function POST(request) {
       });
     }
 
+    const planCacheKey = `v5:${query}`;
+
     let queryPlan = null;
     try {
       const cached = await db
         .prepare('SELECT plan_json FROM analysis_cache WHERE query = ?')
-        .get(query);
+        .get(planCacheKey);
       if (cached) queryPlan = JSON.parse(cached.plan_json);
     } catch (e) {
       console.warn('Cache read error:', e);
@@ -66,7 +68,7 @@ export async function POST(request) {
           .prepare(
             'INSERT INTO analysis_cache (query, plan_json) VALUES (?, ?) ON CONFLICT DO NOTHING'
           )
-          .run(query, JSON.stringify(queryPlan));
+          .run(planCacheKey, JSON.stringify(queryPlan));
       } catch (e) {
         console.warn('Cache write error:', e);
       }
@@ -154,51 +156,70 @@ export async function POST(request) {
     let allRows = [];
     const datasetMeta = [];
 
-    for (const file of targetFiles) {
-      try {
-        const buffer = await StorageProvider.readFile(file);
-        if (!buffer) continue;
-
-        let csvData;
+    // 병렬 처리: 여러 연도 파일을 동시에 읽음 (순차 처리 대비 속도 대폭 개선)
+    const fileResults = await Promise.all(
+      targetFiles.map(async (file) => {
         try {
-          const utf8Data = buffer.toString('utf8');
-          if (utf8Data.includes('\ufffd')) throw new Error('Not UTF-8');
-          csvData = utf8Data;
-        } catch {
-          const decoder = new TextDecoder('euc-kr');
-          csvData = decoder.decode(buffer);
-        }
+          const buffer = await StorageProvider.readFile(file);
+          if (!buffer) return { rows: [], years: [] };
 
-        const parsed = Papa.parse(csvData, {
-          header: true,
-          skipEmptyLines: true,
-          dynamicTyping: true
-        });
-        if (!parsed.data || parsed.data.length === 0) continue;
+          let csvData;
+          try {
+            const utf8Data = buffer.toString('utf8');
+            if (utf8Data.includes('\ufffd')) throw new Error('Not UTF-8');
+            csvData = utf8Data;
+          } catch {
+            const decoder = new TextDecoder('euc-kr');
+            csvData = decoder.decode(buffer);
+          }
 
-        const yearsInFile = new Set();
-        parsed.data.forEach(row => {
-          const rawYearVal = String(
-            row['조사연월'] || row['조사연도'] || ''
-          );
-          const yearVal = rawYearVal.substring(0, 4);
-          if (yearVal && yearVal.length === 4) {
-            const yInt = parseInt(yearVal);
-            if (yInt >= startYear && yInt <= endYear) {
-              allRows.push(row);
-              yearsInFile.add(yearVal);
+          const parsed = Papa.parse(csvData, {
+            header: true,
+            skipEmptyLines: true,
+            dynamicTyping: true
+          });
+          if (!parsed.data || parsed.data.length === 0) return { rows: [], years: [] };
+
+          // 파일명에서 연도 추출 (YOUTH_2021.csv → "2021")
+          const fileYearMatch = file.match(/(\d{4})/);
+          const fileYear = fileYearMatch ? fileYearMatch[1] : null;
+
+          const yearsInFile = new Set();
+          const fileRows = [];
+
+          parsed.data.forEach(row => {
+            const rawYearVal = String(
+              row['조사연월'] || row['조사연도'] || fileYear || ''
+            );
+            const yearVal = rawYearVal.substring(0, 4);
+            if (yearVal && yearVal.length === 4) {
+              const yInt = parseInt(yearVal);
+              if (yInt >= startYear && yInt <= endYear) {
+                if (!row['조사연월'] && !row['조사연도'] && fileYear) {
+                  row['_fileYear'] = fileYear;
+                }
+                fileRows.push(row);
+                yearsInFile.add(yearVal);
+              }
             }
-          }
-        });
+          });
 
-        yearsInFile.forEach(year => {
-          if (!datasetMeta.find(m => m.year === year)) {
-            datasetMeta.push({ year, label: `${year}년` });
-          }
-        });
-      } catch (fileErr) {
-        console.warn(`File error: ${fileErr.message}`);
-      }
+          return { rows: fileRows, years: [...yearsInFile] };
+        } catch (fileErr) {
+          console.warn(`File error: ${fileErr.message}`);
+          return { rows: [], years: [] };
+        }
+      })
+    );
+
+    // 병렬 결과 취합
+    for (const { rows, years } of fileResults) {
+      allRows = allRows.concat(rows);
+      years.forEach(year => {
+        if (!datasetMeta.find(m => m.year === year)) {
+          datasetMeta.push({ year, label: `${year}년` });
+        }
+      });
     }
 
     const finalResults = AnalystAgent.analyze(allRows, {
