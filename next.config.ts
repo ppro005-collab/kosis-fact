@@ -1,7 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    serverComponentsExternalPackages: ["papaparse", "csv-parser"],
+    outputFileTracingIncludes: {
+      '/api/**/*': ['./data/**/*'],
+    },
+  },
 };
 
 export default nextConfig;

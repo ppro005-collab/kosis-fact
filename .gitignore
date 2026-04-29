@@ -39,6 +39,9 @@ yarn-error.log*
 # KB 색인(용량 큼 — 서버 첫 요청 시 자동 생성)
 /data/kb_index.json
 
+# API 응답 캐시
+/data/analysis_response_cache/*.json
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
