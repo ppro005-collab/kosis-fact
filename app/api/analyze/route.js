@@ -49,7 +49,7 @@ export async function POST(request) {
       });
     }
 
-    const planCacheKey = `v6:${query}`;
+    const planCacheKey = `v7:${query}`;
 
     let queryPlan = null;
     try {
@@ -237,6 +237,8 @@ export async function POST(request) {
       meta: {
         cacheHit: false,
         kbMatchCount: kbMatches.length,
+        filesAvailable: files.length,
+        targetFilesCount: targetFiles.length,
         pipeline: suggestedMetricKey ? 'local_kb' : geminiExtras ? 'gemini' : 'planner'
       },
       plan: {

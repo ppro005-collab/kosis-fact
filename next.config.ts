@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["papaparse", "csv-parser"],
     outputFileTracingIncludes: {
-      '/api/**/*': ['./data/**/*', './knowledge_source/**/*'],
+      '/**/*': ['./data/**/*', './knowledge_source/**/*'],
     },
   },
 };
