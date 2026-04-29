@@ -25,8 +25,8 @@ export async function GET(request) {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
-        client_id: process.env.KAKAO_CLIENT_ID || '', // REST API 키
-        client_secret: process.env.KAKAO_CLIENT_SECRET || '', // 보안 비밀키
+        client_id: process.env.KAKAO_CLIENT_ID || 'a6cc7aa688eb60b7a2c507a54bffbaaf', 
+        client_secret: process.env.KAKAO_CLIENT_SECRET || '', 
         redirect_uri: `${origin}/api/auth/kakao`,
         code,
       }),
@@ -47,7 +47,7 @@ export async function GET(request) {
     }
 
     // 3. 화이트리스트(보안 잠금) 및 DB 연동
-    const masterEmails = (process.env.MASTER_EMAILS || '').split(',').map(e => e.trim());
+    const masterEmails = (process.env.MASTER_EMAILS || 'ppro005@naver.com').split(',').map(e => e.trim());
     const isMaster = masterEmails.includes(email);
     const nickname = userData.properties?.nickname || email.split('@')[0];
 
@@ -89,7 +89,7 @@ export async function GET(request) {
         role: userRecord.role,
         approved: userRecord.approved 
       },
-      process.env.JWT_SECRET || 'fallback-secret-key-12345',
+      process.env.JWT_SECRET || 'kosis-fact-2026-fighting',
       { expiresIn: '7d' }
     );
 
